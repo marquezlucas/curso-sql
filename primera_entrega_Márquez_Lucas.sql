@@ -1,4 +1,3 @@
- 
 -- Creando la base de datos e_commerce_eeuu.
  
 SET NAMES utf8mb4
@@ -99,71 +98,73 @@ CREATE TABLE IF NOT EXISTS segment (
 ) ENGINE=InnoDB AUTO_INCREMENT=1
 ;  
  
+ -- Se crea y se estructura la tabla country.
+DROP TABLE IF EXISTS country;
+CREATE TABLE IF NOT EXISTS country (
+	country_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    country VARCHAR (40) NOT NULL,
+    PRIMARY KEY (country_id)
+)ENGINE=InnoDB AUTO_INCREMENT=1
+; 
+
  -- Se crea y se estructura la tabla client.
- 
+DROP TABLE IF EXISTS client;
 CREATE TABLE IF NOT EXISTS client (
 	customer_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	order_id INT UNSIGNED NOT NULL,
     segment_id INT UNSIGNED NOT NULL,
+    country_id INT UNSIGNED NOT NULL,
     mail VARCHAR(40) NOT NULL,
     PRIMARY KEY (customer_id),
     FOREIGN KEY (order_id) REFERENCES sales (order_id),
-    FOREIGN KEY (segment_id) REFERENCES segment (segment_id)
+    FOREIGN KEY (segment_id) REFERENCES segment (segment_id),
+    FOREIGN KEY (country_id) REFERENCES country (country_id)
 );
 
--- Se crea y se estructura la tabla country.
-
-CREATE TABLE IF NOT EXISTS country (
-	country_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    customer_id INT UNSIGNED NOT NULL,
-    country VARCHAR (40) NOT NULL,
-    PRIMARY KEY (country_id),
-    FOREIGN KEY (customer_id) REFERENCES client (customer_id)
-)ENGINE=InnoDB AUTO_INCREMENT=1
-; 
-
--- Se crea y se estructura la tabla region.
-
-CREATE TABLE IF NOT EXISTS region (
-	region_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    country_id INT UNSIGNED NOT NULL,
-    region VARCHAR (40) NOT NULL,
-    PRIMARY KEY (region_id),
-    FOREIGN KEY (country_id) REFERENCES country (country_id)
-)ENGINE=InnoDB AUTO_INCREMENT=1
-;
 
 -- Se generan tres subtablas de category. Son postal_code, city y state.
 
 -- Se crea y se estructura la tabla postal_code.
-
+DROP TABLE IF EXISTS postal_code;
 CREATE TABLE IF NOT EXISTS postal_code (
 	postal_code_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    region_id INT UNSIGNED NOT NULL,
     postal_code INT NOT NULL,
-    PRIMARY KEY (postal_code_id),
-    FOREIGN KEY (region_id) REFERENCES region (region_id)
+    PRIMARY KEY (postal_code_id)
 )ENGINE=InnoDB AUTO_INCREMENT=1
 ;   
 
 -- Se crea y se estructura la tabla city.
-
+DROP TABLE IF EXISTS city;
 CREATE TABLE IF NOT EXISTS city (
 	city_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     region_id INT UNSIGNED NOT NULL,
     city VARCHAR (40) NOT NULL,
-    PRIMARY KEY (city_id),
-    FOREIGN KEY (region_id) REFERENCES region (region_id)
+    PRIMARY KEY (city_id)
 )ENGINE=InnoDB AUTO_INCREMENT=1
 ;
 
 -- Se crea y se estructura la tabla state.
-
+DROP TABLE IF EXISTS state;
 CREATE TABLE IF NOT EXISTS state (
 	state_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    region_id INT UNSIGNED NOT NULL,
     state VARCHAR (40) NOT NULL,
-    PRIMARY KEY (state_id),
-    FOREIGN KEY (region_id) REFERENCES region (region_id)
+    PRIMARY KEY (state_id)
 )ENGINE=InnoDB AUTO_INCREMENT=1
 ;   
+
+-- Se crea y se estructura la tabla region.
+DROP TABLE IF EXISTS region;
+CREATE TABLE IF NOT EXISTS region (
+	region_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    country_id INT UNSIGNED NOT NULL,
+    state_id INT UNSIGNED NOT NULL,
+    city_id INT UNSIGNED NOT NULL,
+    postal_code_id INT UNSIGNED NOT NULL,
+    region VARCHAR (40) NOT NULL,
+    PRIMARY KEY (region_id),
+    FOREIGN KEY (country_id) REFERENCES country (country_id),
+    FOREIGN KEY (state_id) REFERENCES state (state_id),
+    FOREIGN KEY (city_id) REFERENCES city (city_id),
+    FOREIGN KEY (postal_code_id) REFERENCES postal_code (postal_code_id)
+)ENGINE=InnoDB AUTO_INCREMENT=1
+;
