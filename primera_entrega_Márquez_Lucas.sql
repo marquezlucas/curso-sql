@@ -45,10 +45,30 @@ CREATE TABLE IF NOT EXISTS sales (
     ditail_id INT UNSIGNED NOT NULL,
     order_date DATE,
     discount DECIMAL (4,2),
-    sales DECIMAL (11,2),
+    sales DECIMAL (11,3),
     profit DECIMAL (11,2),
     PRIMARY KEY (order_id),
     FOREIGN KEY (ditail_id) REFERENCES ditail (ditail_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;  
+
+-- Se generan dos subtablas de category. Una es ship_mode y la otra sub_category.
+
+-- Se crea y se estructura la tabla ship_mode.
+
+CREATE TABLE IF NOT EXISTS ship_mode (
+	ship_mode_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ship_mode VARCHAR (40) NOT NULL,
+    PRIMARY KEY (ship_mode_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;  
+
+-- Se crea y se estructura la tabla sub_category.
+ 
+CREATE TABLE IF NOT EXISTS sub_category (
+	sub_category_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    sub_category VARCHAR (40),
+    PRIMARY KEY (sub_category_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1
 ;  
 
@@ -57,35 +77,16 @@ CREATE TABLE IF NOT EXISTS sales (
 CREATE TABLE IF NOT EXISTS category (
 	category_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     product_id INT UNSIGNED NOT NULL,
+    ship_mode_id INT UNSIGNED NOT NULL,
+    sub_category_id INT UNSIGNED NOT NULL,
     category VARCHAR (40),
     PRIMARY KEY (category_id),
-    FOREIGN KEY (product_id) REFERENCES product (product_id)
+    FOREIGN KEY (product_id) REFERENCES product (product_id),
+    FOREIGN KEY (ship_mode_id) REFERENCES ship_mode (ship_mode_id),
+    FOREIGN KEY (sub_category_id) REFERENCES sub_category (sub_category_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1
 ;
 
--- Se generan dos subtablas de category. Una es ship_mode y la otra sub_category.
-
--- Se crea y se estructura la tabla ship_mode.
-
-CREATE TABLE IF NOT EXISTS ship_mode (
-	ship_mode_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    category_id INT UNSIGNED NOT NULL,
-    ship_mode VARCHAR (40) NOT NULL,
-    PRIMARY KEY (ship_mode_id),
-    FOREIGN KEY (category_id) REFERENCES category (category_id)
-)ENGINE=InnoDB AUTO_INCREMENT=1
-;  
-
--- Se crea y se estructura la tabla sub_category.
- 
-CREATE TABLE IF NOT EXISTS sub_category (
-	sub_category_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    category_id INT UNSIGNED NOT NULL,
-    sub_category VARCHAR (40),
-    PRIMARY KEY (sub_category_id),
-    FOREIGN KEY (category_id) REFERENCES category (category_id)
-) ENGINE=InnoDB AUTO_INCREMENT=1
-;  
 
  -- Se continua con la rama de la tabla sales.
  
@@ -99,39 +100,29 @@ CREATE TABLE IF NOT EXISTS segment (
 ) ENGINE=InnoDB AUTO_INCREMENT=1
 ;  
  
+ -- Se crea y se estructura la tabla country.
+
+CREATE TABLE IF NOT EXISTS country (
+	country_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    country VARCHAR (40) NOT NULL,
+    PRIMARY KEY (country_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+; 
+
  -- Se crea y se estructura la tabla client.
- 
+
 CREATE TABLE IF NOT EXISTS client (
 	customer_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	order_id INT UNSIGNED NOT NULL,
     segment_id INT UNSIGNED NOT NULL,
+    country_id INT UNSIGNED NOT NULL,
     mail VARCHAR(40) NOT NULL,
     PRIMARY KEY (customer_id),
     FOREIGN KEY (order_id) REFERENCES sales (order_id),
-    FOREIGN KEY (segment_id) REFERENCES segment (segment_id)
+    FOREIGN KEY (segment_id) REFERENCES segment (segment_id),
+    FOREIGN KEY (country_id) REFERENCES country (country_id)
 );
 
--- Se crea y se estructura la tabla country.
-
-CREATE TABLE IF NOT EXISTS country (
-	country_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    customer_id INT UNSIGNED NOT NULL,
-    country VARCHAR (40) NOT NULL,
-    PRIMARY KEY (country_id),
-    FOREIGN KEY (customer_id) REFERENCES client (customer_id)
-)ENGINE=InnoDB AUTO_INCREMENT=1
-; 
-
--- Se crea y se estructura la tabla region.
-
-CREATE TABLE IF NOT EXISTS region (
-	region_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    country_id INT UNSIGNED NOT NULL,
-    region VARCHAR (40) NOT NULL,
-    PRIMARY KEY (region_id),
-    FOREIGN KEY (country_id) REFERENCES country (country_id)
-)ENGINE=InnoDB AUTO_INCREMENT=1
-;
 
 -- Se generan tres subtablas de category. Son postal_code, city y state.
 
@@ -139,31 +130,42 @@ CREATE TABLE IF NOT EXISTS region (
 
 CREATE TABLE IF NOT EXISTS postal_code (
 	postal_code_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    region_id INT UNSIGNED NOT NULL,
     postal_code INT NOT NULL,
-    PRIMARY KEY (postal_code_id),
-    FOREIGN KEY (region_id) REFERENCES region (region_id)
-)ENGINE=InnoDB AUTO_INCREMENT=1
+    PRIMARY KEY (postal_code_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
 ;   
 
 -- Se crea y se estructura la tabla city.
 
 CREATE TABLE IF NOT EXISTS city (
 	city_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    region_id INT UNSIGNED NOT NULL,
     city VARCHAR (40) NOT NULL,
-    PRIMARY KEY (city_id),
-    FOREIGN KEY (region_id) REFERENCES region (region_id)
-)ENGINE=InnoDB AUTO_INCREMENT=1
+    PRIMARY KEY (city_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
 ;
 
 -- Se crea y se estructura la tabla state.
 
 CREATE TABLE IF NOT EXISTS state (
 	state_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    region_id INT UNSIGNED NOT NULL,
     state VARCHAR (40) NOT NULL,
-    PRIMARY KEY (state_id),
-    FOREIGN KEY (region_id) REFERENCES region (region_id)
-)ENGINE=InnoDB AUTO_INCREMENT=1
+    PRIMARY KEY (state_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
 ;   
+
+-- Se crea y se estructura la tabla region.
+DROP TABLE IF EXISTS region;
+CREATE TABLE IF NOT EXISTS region (
+	region_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    country_id INT UNSIGNED NOT NULL,
+    state_id INT UNSIGNED NOT NULL,
+    city_id INT UNSIGNED NOT NULL,
+    postal_code_id INT UNSIGNED NOT NULL,
+    region VARCHAR (40) NOT NULL,
+    PRIMARY KEY (region_id),
+    FOREIGN KEY (country_id) REFERENCES country (country_id),
+    FOREIGN KEY (state_id) REFERENCES state (state_id),
+    FOREIGN KEY (city_id) REFERENCES city (city_id),
+    FOREIGN KEY (postal_code_id) REFERENCES postal_code (postal_code_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;
