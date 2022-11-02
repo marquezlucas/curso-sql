@@ -1,3 +1,179 @@
+
+
+
+-- Creando la base de datos e_commerce_eeuu.
+ 
+SET NAMES utf8mb4
+;
+ 
+ 
+DROP SCHEMA IF EXISTS e_commerce_eeuu
+;
+
+CREATE SCHEMA e_commerce_eeuu
+;
+ 
+-- Se llama a la base de datos e_commerce_eeuu.
+ 
+USE e_commerce_eeuu
+;
+ 
+-- Se comienzan a crear las diferentes tablas de la base de datos.
+
+-- Se crea y se estructura la tabla ditail.
+ 
+CREATE TABLE IF NOT EXISTS ditail (
+	ditail_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    quantity INT NOT NULL,
+    PRIMARY KEY (ditail_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;
+ 
+-- Se crea y se estructura la tabla product.
+ 
+CREATE TABLE IF NOT EXISTS product (
+	product_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ditail_id INT UNSIGNED NOT NULL,
+    product_name VARCHAR (100),
+    PRIMARY KEY (product_id),
+    FOREIGN KEY (ditail_id) REFERENCES ditail (ditail_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;
+
+-- Se crea y se estructura la tabla sales.
+
+CREATE TABLE IF NOT EXISTS sales (
+	order_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ditail_id INT UNSIGNED NOT NULL,
+    order_date DATE,
+    discount DECIMAL (4,2),
+    sales DECIMAL (11,3),
+    profit DECIMAL (11,2),
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (ditail_id) REFERENCES ditail (ditail_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;  
+
+-- Se generan dos subtablas de category. Una es ship_mode y la otra sub_category.
+
+-- Se crea y se estructura la tabla ship_mode.
+
+CREATE TABLE IF NOT EXISTS ship_mode (
+	ship_mode_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ship_mode VARCHAR (40) NOT NULL,
+    PRIMARY KEY (ship_mode_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;  
+
+-- Se crea y se estructura la tabla sub_category.
+ 
+CREATE TABLE IF NOT EXISTS sub_category (
+	sub_category_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    sub_category VARCHAR (40),
+    PRIMARY KEY (sub_category_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;  
+
+ -- Se crea y se estructura la tabla category. Se continua con la rama de la tabla product.
+ 
+CREATE TABLE IF NOT EXISTS category (
+	category_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    product_id INT UNSIGNED NOT NULL,
+    ship_mode_id INT UNSIGNED NOT NULL,
+    sub_category_id INT UNSIGNED NOT NULL,
+    category VARCHAR (40),
+    PRIMARY KEY (category_id),
+    FOREIGN KEY (product_id) REFERENCES product (product_id),
+    FOREIGN KEY (ship_mode_id) REFERENCES ship_mode (ship_mode_id),
+    FOREIGN KEY (sub_category_id) REFERENCES sub_category (sub_category_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;
+
+
+ -- Se continua con la rama de la tabla sales.
+ 
+-- Se crea y se estructura la tabla segment para poder crear la tabla client ya que segment es una FK en client 
+-- y si no la genero de antemano, al momento de crear la tabla client no me lo va a permitir. 
+
+CREATE TABLE IF NOT EXISTS segment (
+	segment_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    segment VARCHAR (40),
+    PRIMARY KEY (segment_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;  
+ 
+ -- Se crea y se estructura la tabla country.
+
+CREATE TABLE IF NOT EXISTS country (
+	country_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    country VARCHAR (40) NOT NULL,
+    PRIMARY KEY (country_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+; 
+
+ -- Se crea y se estructura la tabla client.
+
+CREATE TABLE IF NOT EXISTS client (
+	customer_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	order_id INT UNSIGNED NOT NULL,
+    segment_id INT UNSIGNED NOT NULL,
+    country_id INT UNSIGNED NOT NULL,
+    mail VARCHAR(40) NOT NULL,
+    PRIMARY KEY (customer_id),
+    FOREIGN KEY (order_id) REFERENCES sales (order_id),
+    FOREIGN KEY (segment_id) REFERENCES segment (segment_id),
+    FOREIGN KEY (country_id) REFERENCES country (country_id)
+);
+
+
+-- Se generan tres subtablas de category. Son postal_code, city y state.
+
+-- Se crea y se estructura la tabla postal_code.
+
+CREATE TABLE IF NOT EXISTS postal_code (
+	postal_code_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    postal_code INT NOT NULL,
+    PRIMARY KEY (postal_code_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;   
+
+-- Se crea y se estructura la tabla city.
+
+CREATE TABLE IF NOT EXISTS city (
+	city_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    city VARCHAR (40) NOT NULL,
+    PRIMARY KEY (city_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;
+
+-- Se crea y se estructura la tabla state.
+
+CREATE TABLE IF NOT EXISTS state (
+	state_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    state VARCHAR (40) NOT NULL,
+    PRIMARY KEY (state_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;   
+
+-- Se crea y se estructura la tabla region.
+DROP TABLE IF EXISTS region;
+CREATE TABLE IF NOT EXISTS region (
+	region_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    country_id INT UNSIGNED NOT NULL,
+    state_id INT UNSIGNED NOT NULL,
+    city_id INT UNSIGNED NOT NULL,
+    postal_code_id INT UNSIGNED NOT NULL,
+    region VARCHAR (40) NOT NULL,
+    PRIMARY KEY (region_id),
+    FOREIGN KEY (country_id) REFERENCES country (country_id),
+    FOREIGN KEY (state_id) REFERENCES state (state_id),
+    FOREIGN KEY (city_id) REFERENCES city (city_id),
+    FOREIGN KEY (postal_code_id) REFERENCES postal_code (postal_code_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1
+;
+
+-- se comienza a insertar registros
+
 USE e_commerce_eeuu
 ;
 
@@ -463,3 +639,84 @@ INSERT INTO client (order_id, segment_id, country_id, mail) VALUES
 (30, 30, 30, '333@hotmail.com')
 ;
 
+-- se comienza a crear views
+
+USE e_commerce_eeuu;
+
+CREATE OR REPLACE VIEW client_sales_view
+AS
+	SELECT
+    c.customer_id,
+    c.mail,
+    v.order_date,
+    v.discount,
+    v.sales,
+    v.profit
+    FROM 
+    client AS c JOIN sales AS v ON (c.order_id = v.order_id)
+    WHERE mail LIKE UPPER('%@hotmail%')
+;    
+    
+CREATE OR REPLACE VIEW region_segment_ditail_view
+AS
+	SELECT
+    v.region,
+    b.segment,
+    COUNT(n.quantity)
+    FROM
+    client AS c 
+    JOIN region AS v ON (c.customer_id = v.region_id)
+    JOIN segment AS b ON (c.segment_id = b.segment_id) 
+    JOIN ditail AS n ON (c.customer_id = n.ditail_id)
+GROUP BY v.region
+;
+    
+CREATE OR REPLACE VIEW city_sales_ditail_product_view
+AS
+	SELECT
+    c.city,
+    v.sales,
+    b.quantity,
+    n.product_name
+    FROM
+    client AS x 
+    JOIN city AS c ON (x.customer_id = c.city_id)
+    JOIN sales AS v ON (x.order_id = v.order_id) 
+    JOIN ditail AS b ON (v.order_id = b.ditail_id)
+    JOIN product AS n ON (b.ditail_id = n.ditail_id)
+ORDER BY c.city DESC
+;
+
+CREATE OR REPLACE VIEW category_ship_mode_sub_category_product_ditail_sales_view
+AS
+	SELECT
+    c.category,
+    v.ship_mode,
+    b.sub_category,
+    n.product_name,
+    m.quantity,
+    l.*
+    FROM
+    category AS c 
+    JOIN ship_mode AS v ON (c.ship_mode_id = v.ship_mode_id)
+    JOIN sub_category AS b ON (c.sub_category_id = b.sub_category_id) 
+    JOIN product AS n ON (c.product_id = n.product_id)
+    JOIN ditail AS m ON (n.ditail_id = m.ditail_id)
+    JOIN sales AS l ON (m.ditail_id = l.ditail_id)
+	WHERE m.quantity > 2 AND v.ship_mode = 'First Class'
+;
+
+CREATE OR REPLACE VIEW product_sales_city_postal_code_view
+AS
+	SELECT
+    b.city,
+    n.postal_code,
+    SUM(v.profit) AS suma_profit
+    FROM sales AS v
+    JOIN product AS c ON (v.ditail_id = c.ditail_id)
+    JOIN city AS b ON (v.order_id = b.city_id)
+    JOIN postal_code AS n ON (v.order_id = postal_code_id)
+    GROUP BY n.postal_code
+    ORDER BY b.city
+;
+    
