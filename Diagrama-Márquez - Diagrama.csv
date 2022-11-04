@@ -1,0 +1,106 @@
+,,,,,,,,
+,,,,,,,,
+,Tabla,client,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS DE CADA CLIENTE,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,customer_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario de cada cliente
+,FK,order_id,INT,-,NOT NULL,-,-,id de cada region dentro de los Estados Unidos
+,FK,segment_id,INT,-,NOT NULL,-,-,id sobre que tipo de cliente es
+,FK,country_id,INT,-,NOT NULL,-,-,id de cada país 
+,-,mail,VARCHAR,40,,-,-,mail del cliente
+,,,,,,,,
+,,,,,,,,
+,Tabla,segment,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS SOBRE QUE TIPO DE CLIENTE ES,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,segment_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario sobre que tipo de cliente es
+,-,segment,VARCHAR,40,NOT NULL,-,-,que tipo de cliente es
+,,,,,,,,
+,,,,,,,,
+,Tabla,region,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS LOGISTICOS,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,region_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario de cada region
+,FK,country_id,INT,-,NOT NULL,-,-,id país de la venta
+,FK,postal_code_id,INT,-,NOT NULL,-,-,id codigo postal de la region 
+,FK,city_id,INT,-,NOT NULL,-,-,id sobre la ciudad de la venta
+,FK,state_id,INT,-,NOT NULL,-,-,id del estado donde se realizo la venta
+,-,region,VARCHAR,40,-,,-,region dentro de los Estados Unidos
+,,,,,,,,
+,,,,,,,,
+,Tabla,postal_code,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS DE LOS CODIGOS POSTALES,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,postal_code_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario del codigo postal de la region 
+,-,postal_code,INT,-,NOT NULL,-,-,codigo postal de la region 
+,,,,,,,,
+,,,,,,,,
+,Tabla,country,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS SOBRE EL PAÍS DONDE SE REALIZO LA VENTA,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,country_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario de cada país 
+,-,country,VARCHAR,40,,,,país de la venta
+,,,,,,,,
+,,,,,,,,
+,Tabla,city,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS SOBRE LA CIUDAD DONDE SE REALIZO LA VENTA,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,city_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario sobre la ciudad de la venta
+,-,city,VARCHAR,40,-,-,-,ciudad de la venta
+,,,,,,,,
+,,,,,,,,
+,Tabla,state,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS SOBRE EL ESTADO DONDE SE REALIZO LA VENTA,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,state_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario del estado donde se realizo la venta
+,-,state,VARCHAR,40,-,-,-,estado donde se realizo la venta
+,,,,,,,,
+,,,,,,,,
+,Tabla,sales,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS DE LAS VENTAS,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,order_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario de cada pedido
+,FK,ditail_id,INT,-,NOT NULL,-,-,id de cada cliente
+,-,order_date,DATE,-,-,-,-,fecha de la venta
+,-,discount,DECIMAL,"4,2",-,-,-,descuento realizado sobre la compra
+,-,sales,DECIMAL,"11,3",-,-,-,numero de la venta realizada
+,-,profit,DECIMAL,"11,2",-,-,-,saldo positivo o negativo luego de la venta
+,,,,,,,,
+,,,,,,,,
+,Tabla,product,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS NOMBRES DE LOS PRODUCTOS,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,product_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario de cada producto
+,FK,ditail_id,INT,-,NOT NULL,-,-,id primario de cada categoria
+,-,product_name,VARCHAR,100,NOT NULL,-,-,nombre del producto
+,,,,,,,,
+,,,,,,,,
+,Tabla,category,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS SOBRE QUE CATEGORIA ES,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,category_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario de cada categoria
+,FK,product_id,INT,-,NOT NULL,-,-,id de cada producto
+,FK,ship_mode_id,INT,-,NOT NULL,-,-,id de la clase de envio
+,FK,sub_category_id,INT,-,NOT NULL,-,-,id de la subdivision de la categoria 
+,-,category,VARCHAR,40,-,-,-,categoria del producto
+,,,,,,,,
+,,,,,,,,
+,Tabla,ship_mode,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS SOBRE LAS CATEGORIAS DE ENVIO,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,ship_mode_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario de la clase de envio
+,-,ship_mode,VARCHAR,40,-,-,-,la clase de valor por la que se pago el envio
+,,,,,,,,
+,,,,,,,,
+,Tabla,sub_category,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS SOBRE LA SUBDIVISION DE LA CATEGORIA,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,sub_category_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario de la subdivision de la categoria 
+,-,sub_category,VARCHAR,40,-,-,-,la subdivision de la categoria 
+,,,,,,,,
+,,,,,,,,
+,Tabla,ditail,,,,,,
+,Descripción,TABLA DIMENSIONAL DONDE SE GUARDAN LOS DATOS SOBRE LA CANTIDAD DE PRODUCTOS VENDIDOS,,,,,,
+,KEY,COLUMN,TYPE,LENGHT,NOT NULL,UNIQUE,DEFAULT,NOTES
+,PK,ditail_id,INT,-,NOT NULL,-,AUTO_INCREMENT,id primario para cada transaccion realizada
+,-,quantity,INT,-,NOT NULL,-,-,cantidad de producto vendido
